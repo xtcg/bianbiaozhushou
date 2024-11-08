@@ -1,0 +1,137 @@
+{
+    
+        "项目名称": {
+            "query": "招标公告",
+            "global": false
+        }
+    ,
+    
+        "项目业主": {
+            "section_query": "招标条件 联系方式",
+            "query": "项目业主 招标人",
+            "global": true,
+            "k_section": 6,
+            "k": 6
+        }
+    ,
+    
+        "项目背景": {
+            "query": "",
+            "global": null
+        }
+    ,
+    
+        "项目概况": {
+            "section_query": ["项目概况", "项目概况与招标范围", "组团概况"],
+            "query": "项目概况",
+            "global": false,
+            "section_number": 5,
+            "k": 15,
+            "k_section": 5
+        }
+    ,
+    
+        "其他需重点关注的技术要求": {
+            "query": "",
+            "global": null
+        }
+    ,
+    
+        "建设地点": {
+            "query": "项目概况 建设地点",
+            "global": true
+        }
+    ,
+    
+        "计划工期": {
+            "query": "计划工期 工期要求",
+            "global": true
+        }
+    ,
+    
+        "质量标准": {
+            "section_query": ["质量标准", "工程质量"],
+            "query": "质量标准 工程质量",
+            "global": true,
+            "section_number": 5,
+            "k_section": 1,
+            "k": 11
+        }
+    ,
+    
+        "最高投标限价": {
+            "section_query": ["最高投标限价", "投标人须知前附表"],
+            "query": "最高投标限价",
+            "global": true,
+            "section_number": 5,
+            "k_section": 1,
+            "k": 11
+        }
+    ,
+    
+        "投标文件递交": {
+            "query": "投标文件递交 截止时间 投标方式",
+            "global": true
+        }
+    ,
+
+        "招标范围": {
+            "query": "招标范围 招标公告",
+            "global": true,
+            "k": 1,
+            "k_section": 15
+        }
+    ,
+
+        "合同价格": {
+            "query": "合同价格",
+            "global": false
+        }
+    ,
+    
+        "预付款": {
+            "query": "预付款",
+            "global": false
+        }
+    ,
+    
+        "工程进度付款": {
+            "query": "工程进度付款",
+            "global": false
+        }
+    ,
+    
+        "质量保证金": {
+            "query": "质量保证金",
+            "global": false
+        }
+    ,
+    
+        "竣工结算": {
+            "query": "竣工结算",
+            "global": false
+        }
+    ,
+    
+        "最终结清": {
+            "query": "最终结清",
+            "global": false
+        }
+    ,
+    
+        "增值税专用发票": {
+            "query": "增值税专用发票",
+            "global": false
+        }
+    ,
+    
+        "支付方式": {
+            "section_query": ["支付方式", "EPC 总承包合同适用增值税税目及税率"],
+            "query": "支付方式",
+            "global": false, 
+            "section_number": 5,
+            "k_section": 1,
+            "k": 11
+        }
+    
+}

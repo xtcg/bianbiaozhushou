@@ -1,0 +1,118 @@
+{
+    
+        "项目名称": {
+            "query": "招标公告",
+            "global": false
+        }
+    ,
+    
+        "项目业主": {
+            "query": "招标人 联系方式",
+            "global": true
+        }
+    ,
+    
+        "项目背景": {
+            "query": "",
+            "global": null
+        }
+    ,
+    
+        "项目概况": {
+            "query": "技术标准和要求 总则 组团概况 各标段情况招标公告 项目概况 技术标准和要求",
+            "global": false,
+            "k": 10,
+            "k_section": 5
+        }
+    ,
+    
+        "其他需重点关注的技术要求": {
+            "query": "",
+            "global": null
+        }
+    ,
+    
+        "建设地点": {
+            "query": "建设地点",
+            "global": true
+        }
+    ,
+    
+        "计划工期": {
+            "query": "计划工期 工期要求",
+            "global": true
+        }
+    ,
+    
+        "质量标准": {
+            "query": "质量标准 工程质量",
+            "global": true
+        }
+    ,
+    
+        "最高投标限价": {
+            "query": "最高投标限价",
+            "global": true
+        }
+    ,
+    
+        "投标文件递交": {
+            "query": "投标文件递交 截止时间 投标方式",
+            "global": true
+        }
+    ,
+
+        "招标范围": {
+            "query": "招标公告 招标范围 技术标准和要求",
+            "global": true
+        }
+    ,
+
+        "合同价格": {
+            "query": "合同价格",
+            "global": false
+        }
+    ,
+    
+        "预付款": {
+            "query": "预付款",
+            "global": false
+        }
+    ,
+    
+        "工程进度付款": {
+            "query": "工程进度付款",
+            "global": false
+        }
+    ,
+    
+        "质量保证金": {
+            "query": "质量保证金",
+            "global": false
+        }
+    ,
+    
+        "竣工结算": {
+            "query": "竣工结算",
+            "global": false
+        }
+    ,
+    
+        "最终结清": {
+            "query": "最终结清",
+            "global": false
+        }
+    ,
+    
+        "增值税专用发票": {
+            "query": "增值税专用发票",
+            "global": false
+        }
+    ,
+    
+        "支付方式": {
+            "query": "支付方式",
+            "global": false
+        }
+    
+}

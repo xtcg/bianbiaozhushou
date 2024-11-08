@@ -1,0 +1,163 @@
+{
+    "项目名称一致性": {
+        "tender_section": "",
+        "bid_section_query": "",
+        "bid_query": "",
+        "location": "",
+        "date": "",
+        "keywords": [ "工程名称", "项目名称", "EPC总承包"]
+    },
+    "项目名称符合性 ": {
+        "tender_section": "项目名称",
+        "bid_section_query": "",
+        "bid_query": "",
+        "location": "",
+        "date": "",
+        "keywords": [ "工程名称", "项目名称", "EPC总承包"]
+    },
+    "项目业主一致性": {
+        "tender_section": "",
+        "bid_section_query": "",
+        "bid_query": "",
+        "location": "",
+        "date": "",
+        "keywords": ["有限公司", "有限责任公司"]
+    },
+    "项目业主符合性": {
+        "tender_section": "项目业主",
+        "bid_section_query": "",
+        "bid_query": "",
+        "location": "",
+        "date": "",
+        "keywords": ["有限公司", "有限责任公司"]
+    },
+    "标段名称一致性": {
+        "tender_section": "",
+        "bid_section_query": "",
+        "bid_query": "",
+        "location": "",
+        "date": "",
+        "keywords": ["标段"]
+    },
+    "标段名称符合性": {
+        "tender_section": "标段名称",
+        "bid_section_query": "",
+        "bid_query": "",
+        "location": "",
+        "date": "",
+        "keywords": ["标段"]
+    },
+    "项目编号一致性": {
+        "tender_section": "",
+        "bid_section_query": "",
+        "bid_query": "",
+        "location": "",
+        "date": "",
+        "keywords": ["项目代码", "项目编号","编号"]
+    },
+    "项目编号符合性": {
+        "tender_section": "项目编号",
+        "bid_section_query": "",
+        "bid_query": "",
+        "location": "",
+        "date": "",
+        "keywords": ["项目代码", "项目编号","编号"]
+    },
+    "招标编号一致性": {
+        "tender_section": "",
+        "bid_section_query": "",
+        "bid_query": "",
+        "location": "",
+        "date": "",
+        "keywords": ["招标编号","编号"]
+    },
+    "招标编号符合性": {
+        "tender_section": "招标编号",
+        "bid_section_query": "",
+        "bid_query": "",
+        "location": "",
+        "date": "",
+        "keywords": ["招标编号","编号"]
+    },
+    "工期一致性": {
+        "tender_section": "",
+        "bid_section_query": "",
+        "bid_query": "",
+        "location": "",
+        "date": "",
+        "keywords": ["工期", "日期"]
+    },
+    "工期符合性": {
+        "tender_section": "计划工期",
+        "bid_section_query": "",
+        "bid_query": "",
+        "location": "",
+        "date": "",
+        "keywords": ["工期", "日期"]
+    },
+    "质量": {
+        "tender_section": "质量标准",
+        "bid_section_query": ["质量"],
+        "bid_query": "质量",
+        "location": "",
+        "date": "",
+        "keywords": ""
+    },
+    "安全": {
+        "tender_section": "安全",
+        "bid_section_query": ["安全"],
+        "bid_query": "安全",
+        "location": "",
+        "date": "",
+        "keywords": ""
+    },
+    "落款日期一致性": {
+        "tender_section": "",
+        "bid_section_query": "",
+        "bid_query": "",
+        "location": "",
+        "date": "(\\d+年)?\\d+月\\d+日",
+        "keywords": ""
+    },
+    "落款日期符合性": {
+        "tender_section": ["招标文件获取时间", "投标文件截止时间"],
+        "bid_section_query": "",
+        "bid_query": "",
+        "location": "",
+        "date": "(\\d+年)?\\d+月\\d+日",
+        "keywords": ""
+    },
+    "不相关地点": {
+        "tender_section": "建设地点",
+        "bid_section_query": "",
+        "bid_query": "",
+        "location": ["省", "市", "镇", "县", "村", "地点", "地址"],
+        "date": "",
+        "keywords": ""
+    },
+    "不相关行业": {
+        "tender_section": "相关行业",
+        "bid_section_query": "标准规范",
+        "bid_query": "行业",
+        "location": "",
+        "date": "",
+        "keywords": ""
+    },
+    "报价唯一": {
+        "tender_section": "",
+        "bid_section_query": "",
+        "bid_query": "",
+        "location": "",
+        "date": "",
+        "keywords": "",
+        "money": "\\d{1,3}(?:,\\d{3})*(?:\\.\\d+)?元"
+    },
+    "人员要求": {
+        "tender_section": "人员数量要求",
+        "bid_section_query": "人员配置",
+        "bid_query": "人员配置",
+        "location": "",
+        "date": "",
+        "keywords": ""
+    }
+}

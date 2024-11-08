@@ -1,0 +1,61 @@
+{
+    
+    "项目名称": {
+        "zhaobiao_section": ["招标公告", "项目概况"],
+        "zhaobiao_content": "名称",
+        "toubiao_section": ["简介", "设计背景", "项目概述", "商务投标文件"],
+        "toubiao_content": "项目名称",
+        "k_section": 1,
+        "k": 12
+    }
+,
+
+    "项目业主": {
+        "zhaobiao_section": "",
+        "zhaobiao_content": "",
+        "toubiao_section": "",
+        "toubiao_content": ""
+    }
+,
+
+    "标段名称": {
+        "zhaobiao_section": "",
+        "zhaobiao_content": "",
+        "toubiao_section": "",
+        "toubiao_content": ""
+    }
+,
+
+    "工期": {
+        "zhaobiao_section": ["工期", "项目概况与招标范围", "投标人须知前附表"],
+        "zhaobiao_content": "工期",
+        "toubiao_section": ["工期和进度", "工期目标", "商务投标文件"],
+        "toubiao_content": "工期",
+        "k_section": 1,
+        "k": 12
+    }
+,
+
+    "质量": {
+        "zhaobiao_section": "质量",
+        "zhaobiao_content": "质量",
+        "toubiao_section": "质量",
+        "toubiao_content": "质量"
+    }
+,
+
+    "安全": {
+        "zhaobiao_section": "安全",
+        "zhaobiao_content": "安全",
+        "toubiao_section": "安全",
+        "toubiao_content": "安全"
+    }
+,
+
+    "文中落款日期": {
+        "zhaobiao_section": "",
+        "zhaobiao_content": "",
+        "toubiao_section": "",
+        "toubiao_content": ""
+    }
+}
