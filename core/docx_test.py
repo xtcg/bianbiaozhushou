@@ -42,65 +42,70 @@ def generate_section_content(element: str, query_dict: dict, metadata: dict, all
     query = query_dict[element]
     section_results, page_involved = None, []
     tender_element["reference"]["content"] = []
-    if query.get("front_page", False):
-        tender_element["reference"]["content"] = [{'page': metadata[0]['first_index'], 'content': '\n'.join(metadata[0]['text'])}]
-    else:
-        if section_query:=query.get("section_query", False):
-            section_results, page_involved = section_retrieve(section_query, all_documents, rag1)     
-
-        section_docs, docs_filtered = content_retrieve(query, db_all_documents, 20, section_results, page_involved)
-
-        if section_docs:
-            try:
-                docs = rerank_content(query.get('query', element), docs_filtered, top_n=8)
-                rag_results = section_docs + docs
-            except:
-                print(element)
+    try:
+        if query.get("front_page", False):
+            tender_element["reference"]["content"] = [{'page': metadata[0]['first_index'], 'content': '\n'.join(metadata[0]['text'])}]
         else:
-            global_related = []
-            global_retriever = db_all_documents.as_retriever(search_kwargs={'k': 8})
-            global_related = global_retriever.invoke(query.get('query','.'))
-            reranked_content = rerank_content(query.get('query', element), global_related, top_n=15)
+            if section_query:=query.get("section_query", False):
+                section_results, page_involved = section_retrieve(section_query, all_documents, rag1)     
 
-            rag_results = docs_filtered + reranked_content
-        right_threshold = query.get('context', 3100)
-        mem = []
-        all_doc_length = len(all_doc)
-        # print(rag_results)
-        for rr in rag_results:
-            try:
-                pos = all_doc.index(rr.page_content)
-            except:
-                print(rr.page_content)
-            left = pos
-            right = min(all_doc_length,pos+100+right_threshold-len(rr.page_content))
-            flag = 0
-            # print(rr,left,right)
-            for i in range(len(mem)):
-                if  right <= mem[i][1] and left >= mem[i][0]:
-                    flag = 1
-                    break
-                elif (left - mem[i][1]) * (right - mem[i][0]) <= 0 and right > mem[i][1]:
-                    l = mem[i][0]
-                    r = (right-mem[i][1])//2+mem[i][1]
-                    mem[i] = [l,r,mem[i][2]]
-                    flag = 1
-                    break
-            if flag == 0:
-                mem.append([left,right, rr.metadata['page']])    
+            section_docs, docs_filtered = content_retrieve(query, db_all_documents, 20, section_results, page_involved)
 
-    
-        for l,r,page in mem:
-            tender_element["reference"]["content"].append({'page': page, 'content': all_doc[l:r]})
-        if query.get("use_front_page", False):
-            tender_element["reference"]["content"] = [{'page': metadata[0]['first_index'], 'content': '\n'.join(metadata[0]['text'])}] + tender_element["reference"]["content"]
-    # length_list = [len(x) for x in tender_element["reference"]["content"]]
-    tender_element["reference"]["content"][:] = tender_element["reference"]["content"][:16]
-    content_page  = generate_response(element, tender_element["reference"]["content"], BASEDIR.joinpath('core/abstract/prompt.json'))
-    # content_page = parse_and_combine_content(content_page)
-    # content_page = 'a'
-    tender_element["ai_result"] = content_page
-    tender_element["reference"]["location"] = ', '.join([str(x['page']) for x in tender_element['reference']['content']])
+            if section_docs:
+                try:
+                    docs = rerank_content(query.get('query', element), docs_filtered, top_n=8)
+                    rag_results = section_docs + docs
+                except:
+                    print(element)
+            else:
+                global_related = []
+                global_retriever = db_all_documents.as_retriever(search_kwargs={'k': 8})
+                global_related = global_retriever.invoke(query.get('query','.'))
+                reranked_content = rerank_content(query.get('query', element), global_related, top_n=15)
+
+                rag_results = docs_filtered + reranked_content
+            right_threshold = query.get('context', 3100)
+            mem = []
+            all_doc_length = len(all_doc)
+            # print(rag_results)
+            for rr in rag_results:
+                try:
+                    pos = all_doc.index(rr.page_content)
+                except:
+                    print(rr.page_content)
+                left = pos
+                right = min(all_doc_length,pos+100+right_threshold-len(rr.page_content))
+                flag = 0
+                # print(rr,left,right)
+                for i in range(len(mem)):
+                    if  right <= mem[i][1] and left >= mem[i][0]:
+                        flag = 1
+                        break
+                    elif (left - mem[i][1]) * (right - mem[i][0]) <= 0 and right > mem[i][1]:
+                        l = mem[i][0]
+                        r = (right-mem[i][1])//2+mem[i][1]
+                        mem[i] = [l,r,mem[i][2]]
+                        flag = 1
+                        break
+                if flag == 0:
+                    mem.append([left,right, rr.metadata['page']])    
+
+        
+            for l,r,page in mem:
+                tender_element["reference"]["content"].append({'page': page, 'content': all_doc[l:r]})
+            if query.get("use_front_page", False):
+                tender_element["reference"]["content"] = [{'page': metadata[0]['first_index'], 'content': '\n'.join(metadata[0]['text'])}] + tender_element["reference"]["content"]
+        # length_list = [len(x) for x in tender_element["reference"]["content"]]
+        tender_element["reference"]["content"][:] = tender_element["reference"]["content"][:16]
+        content_page  = generate_response(element, tender_element["reference"]["content"], BASEDIR.joinpath('core/abstract/prompt.json'))
+        # content_page = parse_and_combine_content(content_page)
+        # content_page = 'a'
+        tender_element["ai_result"] = content_page
+        tender_element["reference"]["location"] = ', '.join([str(x['page']) for x in tender_element['reference']['content']])
+    except Exception as e:
+        print(e)
+        tender_element["ai_result"] = ''
+        tender_element["reference"]["location"] = ''
     return tender_element
 
 
@@ -203,49 +208,57 @@ def generate_key_content_check_section(element: str, query_dict: dict, bid_metad
     check_element["tender_reference"] = {}
     element_query = query_dict[element]
     seen, bid_info = set(), list()
-    if p:=element_query.get("location", False):
-        bid_info = extract_location_context(bid_metadata, p)
-    elif p:=element_query.get("money", False):
-        bid_info = extract_money_context(bid_metadata, p)
-    elif p:=element_query.get("date", False):
-        bid_info = extract_dates_with_context(bid_metadata, p)
-    elif keywords:=element_query.get("keywords", False):
-        bid_info = extract_keyword_content(bid_metadata, keywords)
-    else:
-        section_results, page_involved = section_retrieve(element_query.get("bid_section_query", [element]), all_bid_documents, rag1)     
-    
-        section_docs, docs_filtered = content_retrieve(element_query, db_all_documents, 20, section_results, page_involved)
-
-        if section_docs:    
-            rag_results = rerank_content(element_query.get('query', element), section_docs, top_n=8)
+    try:
+        if p:=element_query.get("location", False):
+            bid_info = extract_location_context(bid_metadata, p)
+        elif p:=element_query.get("money", False):
+            bid_info = extract_money_context(bid_metadata, p)
+        elif p:=element_query.get("date", False):
+            bid_info = extract_dates_with_context(bid_metadata, p)
+        elif keywords:=element_query.get("keywords", False):
+            bid_info = extract_keyword_content(bid_metadata, keywords)
         else:
-            rag_results = rerank_content(element_query.get('query', element), docs_filtered, top_n=15)
-
-        for rr in rag_results:
-
-            bid_info.append({'page': rr.metadata['page'], 'content': rr.page_content})
-    if element_query.get("tender_section", False) or element_query.get("tender_info", False):
-        if tender_query:=element_query.get("tender_section", False):
-            if isinstance(tender_query, list):
-                tender_info = [f"{j}: {tender_dict[j]}" for j in tender_query]
-                tender_info = "\n".join(tender_info)
-            else:
-                tender_info = f"{tender_query}: {tender_dict[tender_query]}"
-        elif info:=element_query.get("tender_info", False):
-            tender_info = f"{element}: {info}"
-    
-        content = generate_respons_pair(element, bid_info, tender_info, BASEDIR.joinpath('core/review/prompt.json'))
-        content = parse_and_combine_content_review(content)
+            section_results, page_involved = section_retrieve(element_query.get("bid_section_query", [element]), all_bid_documents, rag1)     
         
-    else:
-        content = generate_response(element, bid_info, BASEDIR.joinpath('core/review/prompt.json'), check=False)
-        content = parse_and_combine_content_review_bid(content)
-    
-    check_element["conclusion"] = content["conclusion"]
-    check_element["ai_result"] = content["content"]
-    check_element["tender_reference"]["location"] = content.get("tender_source", "")
-    # check_element["bid_reference"]["location"] = content["page"]
-    check_element["bid_reference"]["content"] = bid_info
+            section_docs, docs_filtered = content_retrieve(element_query, db_all_documents, 20, section_results, page_involved)
+
+            if section_docs:    
+                rag_results = rerank_content(element_query.get('query', element), section_docs, top_n=8)
+            else:
+                rag_results = rerank_content(element_query.get('query', element), docs_filtered, top_n=15)
+
+            for rr in rag_results:
+
+                bid_info.append({'page': rr.metadata['page'], 'content': rr.page_content})
+        if element_query.get("tender_section", False) or element_query.get("tender_info", False):
+            if tender_query:=element_query.get("tender_section", False):
+                if isinstance(tender_query, list):
+                    tender_info = [f"{j}: {tender_dict[j]}" for j in tender_query]
+                    tender_info = "\n".join(tender_info)
+                else:
+                    tender_info = f"{tender_query}: {tender_dict[tender_query]}"
+            elif info:=element_query.get("tender_info", False):
+                tender_info = f"{element}: {info}"
+        
+            content = generate_respons_pair(element, bid_info, tender_info, BASEDIR.joinpath('core/review/prompt.json'))
+            content = parse_and_combine_content_review(content)
+            
+        else:
+            content = generate_response(element, bid_info, BASEDIR.joinpath('core/review/prompt.json'), check=False)
+            content = parse_and_combine_content_review_bid(content)
+        
+        check_element["conclusion"] = content["conclusion"]
+        check_element["ai_result"] = content["content"]
+        check_element["tender_reference"]["location"] = content.get("tender_source", "")
+        # check_element["bid_reference"]["location"] = content["page"]
+        check_element["bid_reference"]["content"] = bid_info
+    except Exception as e:
+        print(e)
+        check_element["conclusion"] = ''
+        check_element["ai_result"] = ''
+        check_element["tender_reference"]["location"] = ''
+        # check_element["bid_reference"]["location"] = content["page"]
+        check_element["bid_reference"]["content"] = ''
     return check_element
 
 
@@ -272,7 +285,7 @@ def generate_key_content_check(tender_list: List[dict], bid_pdf_path: str, temp_
         if dp['type'] == '目录' :continue
         all_doc += cur + '\n'
         for line, index in zip(dp['text'], dp['index']):
-            all_bid_documents.append(langchain_Document(page_content=line, metadata={"page": index}))
+            all_bid_documents_split.append(langchain_Document(page_content=line, metadata={"page": index}))
 
 
     text_splitter = RecursiveCharacterTextSplitter(
