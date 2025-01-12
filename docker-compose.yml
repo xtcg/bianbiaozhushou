@@ -2,20 +2,22 @@ version: "3"
 
 services:
   app_server:
-    image: bianbiaozhushou:v240731
-    deploy:
-      resources:
-        reservations:
-          devices:
-          - capabilities: ["gpu"]
-            driver: nvidia
-            # count: 2  # Adjust the count of GPUs if needed
-            device_ids: ["6"]
+    image: bianbiaozhushou:latest
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #       - capabilities: ["gpu"]
+    #         driver: nvidia
+    #         # count: 2  # Adjust the count of GPUs if needed
+    #         device_ids: ["6"]
     environment:
       TZ: Asia/Shanghai
-      API_BASE: http://192.168.129.84:40079/v1
-      EMBEDDING_URL: http://192.168.129.84:40068/embed
-      RERANKING_URL: http://192.168.129.84:40062/rerank
+      API_BASE: https://api.siliconflow.cn/v1
+      API_KEY: sk-xqwmnocyzfusneirumhmskwiumxtaxiufequpppqwnprntqw
+      EMBEDDING_URL: https://api.siliconflow.cn/v1/embeddings
+      EMBEDDING_MODEL: BAAI/bge-m3
+      RERANKING_URL: https://api.siliconflow.cn/v1/rerank
       WEB_CONCURRENCY: 17
     volumes:
       - /etc/localtime:/etc/localtime
@@ -28,24 +30,24 @@ services:
     labels:
       - "LOG=loki"
 
-  gradio_server:
-    image: bianbiaozhushou:v240731
-    deploy:
-      resources:
-        reservations:
-          devices:
-          - capabilities: ["gpu"]
-            driver: nvidia
-            # count: 2   # Adjust the count of GPUs if needed
-            device_ids: ["5"]
-    environment:
-      TZ: Asia/Shanghai
-      API_BASE: http://192.168.129.84:40079/v1
-      EMBEDDING_URL: http://192.168.129.84:40068/embed
-      RERANKING_URL: http://192.168.129.84:40062/rerank
-    volumes:
-      - .:/code
-    ports:
-        - "40032:8080"
-    command: sh entrypoint.sh gradio
+  # gradio_server:
+  #   image: bianbiaozhushou:v240731
+  #   deploy:
+  #     resources:
+  #       reservations:
+  #         devices:
+  #         - capabilities: ["gpu"]
+  #           driver: nvidia
+  #           # count: 2   # Adjust the count of GPUs if needed
+  #           device_ids: ["5"]
+  #   environment:
+  #     TZ: Asia/Shanghai
+  #     API_BASE: http://192.168.129.84:40079/v1
+  #     EMBEDDING_URL: http://192.168.129.84:40068/embed
+  #     RERANKING_URL: http://192.168.129.84:40062/rerank
+  #   volumes:
+  #     - .:/code
+  #   ports:
+  #       - "40032:8080"
+  #   command: sh entrypoint.sh gradio
 

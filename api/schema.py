@@ -61,7 +61,7 @@ class BidKeyReviewBody(BaseModel):
 class BidKeyReviewResponse(ResponseBase):
     key_censor_fileid: str = Field(description="关键审查docx文件ID", examples=["key_censor_fileid"])
     results: List[ReviewEntry] = Field(description="关键信息审查结论", examples=review_examples)
-
+    key_comment_fileid: str = Field(description="关键审查docx批注文件ID", examples=["key_comment_fileid"])
 
 class BidReqReviewBody(BaseModel):
     tender_summary: List[SummaryEntry] = Field(description="投标文件摘要信息", examples=summary_examples)
@@ -70,3 +70,4 @@ class BidReqReviewBody(BaseModel):
 class BidReqReviewResponse(ResponseBase):
     requirement_censor_fileid: str = Field(description="要求审查docx文件ID", examples=["requirement_censor_fileid"])
     results: List[ReviewEntry] = Field(description="要求审查结果（审查点根据招标文件确定）")
+    requirement_comment_fileid: str = Field(description="要求审查docx批注文件ID", examples=["requirement_comment_fileid"])

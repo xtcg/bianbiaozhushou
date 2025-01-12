@@ -91,7 +91,7 @@ async def review_key_in_tender_doc(
 ):
     bid_pdf_path, file_hash = await fetch_biz_file(bizId, biz_type="bid", temp_path=temp_path)
     cache_path = DEFAULT_CACHE_PATH.joinpath(file_hash)
-    results, censor_docx_path = await asyncio.wait_for(
+    results, censor_docx_path, comments_docx_path = await asyncio.wait_for(
         run_in_threadpool(
             generate_key_content_check,
             tender_list=[x.model_dump() for x in body.tender_summary],
@@ -102,10 +102,12 @@ async def review_key_in_tender_doc(
         timeout=10 * 60
     )
     key_censor_fileid = await upload_biz_file(bizId, biz_type="censor_key", file_path=censor_docx_path)
+    key_comment_fileid = await upload_biz_file(bizId, biz_type="censor_key", file_path=comments_docx_path)
     return schema.BidKeyReviewResponse(
         bizId=bizId,
         key_censor_fileid=key_censor_fileid,
-        results=results
+        results=results,
+        key_comment_fileid=key_comment_fileid
     )
 
 
@@ -121,7 +123,7 @@ async def review_requirement_in_tender_doc(
 ):
     bid_pdf_path, file_hash = await fetch_biz_file(bizId, biz_type="bid", temp_path=temp_path)
     cache_path = DEFAULT_CACHE_PATH.joinpath(file_hash)
-    results, censor_docx_path = await asyncio.wait_for(
+    results, censor_docx_path, comments_docx_path = await asyncio.wait_for(
         run_in_threadpool(
             generate_bid_content_check,
             tender_list=[x.model_dump() for x in body.tender_summary],
@@ -132,8 +134,10 @@ async def review_requirement_in_tender_doc(
         timeout=10 * 60
     )
     requirement_censor_fileid = await upload_biz_file(bizId, biz_type="censor_req", file_path=censor_docx_path)
+    requirement_comment_fileid = await upload_biz_file(bizId, biz_type="censor_req", file_path=censor_docx_path)
     return schema.BidReqReviewResponse(
         bizId=bizId,
         requirement_censor_fileid=requirement_censor_fileid,
-        results=results
+        results=results,
+        requirement_comment_fileid=requirement_comment_fileid
     )

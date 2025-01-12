@@ -65,7 +65,15 @@ class Docx():
         des_file = os.path.join(self.cached_dir,'content.json')
         if self.hash_dir and os.path.exists(os.path.join(self.hash_dir,'content.json')):
             self.contents = None
-            with open(os.path.exists(os.path.join(self.hash_dir,'content.json')), 'r') as f:
+            with open(os.path.join(self.hash_dir,'content.json'), 'r') as f:
+                self.contents = json.load(f)
+                if 'catalogs' in self.contents:
+                    self.catalogs = self.contents['catalogs']
+                    self.rag.append(self.contents['append_to_rag'])
+            return 
+        if os.path.exists(des_file):
+ 
+            with open(des_file, 'r') as f:
                 self.contents = json.load(f)
                 if 'catalogs' in self.contents:
                     self.catalogs = self.contents['catalogs']

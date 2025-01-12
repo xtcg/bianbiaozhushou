@@ -3,8 +3,8 @@ from openai import OpenAI
 import json
 
 from core.utils import timer, parse_section_content_info, parse_section_info
-api_key = "EMPTY"
-api_base = os.environ.get("API_BASE", "http://192.168.129.84:40079/v1")
+api_key = os.environ.get("API_KEY", "sk-xqwmnocyzfusneirumhmskwiumxtaxiufequpppqwnprntqw")
+api_base = os.environ.get("API_BASE", "https://api.siliconflow.cn/v1")
 client = OpenAI(api_key=api_key, base_url=api_base)
 
 with open("core/abstract/prompt_check.json", "r", encoding='utf-8') as f:
@@ -28,7 +28,7 @@ def generate_response(element, rag_content, prompt_path, check=False):
         {"role": "system", "content": sysprompt},
         {"role": "user", "content": userprompt}
     ]
-    model = 'qwen72b-chat-int4'
+    model = 'Qwen/Qwen2.5-72B-Instruct'
 
     try:
         stream = client.chat.completions.create(
@@ -105,7 +105,7 @@ def generate_respons_pair(element, bid_info, tender_info, prompt_path):
         {"role": "system", "content": sysprompt},
         {"role": "user", "content": userprompt}
     ]
-    model = 'qwen72b-chat-int4'
+    model = 'Qwen/Qwen2.5-72B-Instruct'
 
     try:
         stream = client.chat.completions.create(
@@ -151,7 +151,7 @@ requirement: 对应的审查要求
         {"role": "user", "content": userprompt}
     ]
     # print(message)
-    model = 'qwen72b-chat-int4'
+    model = 'Qwen/Qwen2.5-72B-Instruct'
 
     try:
         stream = client.chat.completions.create(
@@ -194,7 +194,7 @@ section: 对应的子章节，不包含数字
         {"role": "user", "content": userprompt}
     ]
     print(message)
-    model = 'qwen72b-chat-int4'
+    model = 'Qwen/Qwen2.5-72B-Instruct'
 
     try:
         stream = client.chat.completions.create(
@@ -226,7 +226,7 @@ def generate_outline_content(element, rag_info, eval_info):
         {"role": "system", "content": sysprompt.format(element=element, rag_info=rag_info)},
         {"role": "user", "content": userprompt.format(element=element)}
     ]
-    model = 'qwen72b-chat-int4'
+    model = 'Qwen/Qwen2.5-72B-Instruct'
 
     try:
         stream = client.chat.completions.create(
@@ -268,7 +268,7 @@ section: 总结性的评审标准作为章节名称
         {"role": "user", "content": userprompt.format(element=element)}
             ]
             print(message)
-            model = 'qwen72b-chat-int4'
+            model = 'Qwen/Qwen2.5-72B-Instruct'
 
             try:
                 stream = client.chat.completions.create(
@@ -318,7 +318,7 @@ def generate_outline_type(section_info):
         {"role": "user", "content": userprompt.format(section_info=section_info)}
     ]
     # print(message)
-    model = 'qwen72b-chat-int4'
+    model = 'Qwen/Qwen2.5-72B-Instruct'
 
     try:
         stream = client.chat.completions.create(
@@ -359,7 +359,7 @@ def generate_outline_split(section_info):
         {"role": "user", "content": userprompt.format(info=section_info)}
     ]
     # print(message)
-    model = 'qwen72b-chat-int4'
+    model = 'Qwen/Qwen2.5-72B-Instruct'
 
     try:
         stream = client.chat.completions.create(

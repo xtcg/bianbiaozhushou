@@ -42,70 +42,77 @@ def generate_section_content(element: str, query_dict: dict, metadata: dict, all
     query = query_dict[element]
     section_results, page_involved = None, []
     tender_element["reference"]["content"] = []
-    if query.get("front_page", False):
-        tender_element["reference"]["content"] = [{'page': metadata[0]['first_index'], 'content': '\n'.join(metadata[0]['text'])}]
-    else:
-        if section_query:=query.get("section_query", False):
-            section_results, page_involved = section_retrieve(section_query, all_documents, rag1)     
-
-        section_docs, docs_filtered = content_retrieve(query, db_all_documents, 20, section_results, page_involved)
-
-        if section_docs:
-            try:
-                docs = rerank_content(query.get('query', element), docs_filtered, top_n=8)
-                rag_results = section_docs + docs
-            except:
-                print(element)
+    try:
+        if query.get("front_page", False):
+            tender_element["reference"]["content"] = [{'page': metadata[0]['first_index'], 'content': '\n'.join(metadata[0]['text'])}]
         else:
-            global_related = []
-            global_retriever = db_all_documents.as_retriever(search_kwargs={'k': 8})
-            global_related = global_retriever.invoke(query.get('query','.'))
-            reranked_content = rerank_content(query.get('query', element), global_related, top_n=15)
+            if section_query:=query.get("section_query", False):
+                section_results, page_involved = section_retrieve(section_query, all_documents, rag1)     
 
-            rag_results = docs_filtered + reranked_content
-        right_threshold = query.get('context', 3100)
-        mem = []
-        all_doc_length = len(all_doc)
-        # print(rag_results)
-        for rr in rag_results:
-            try:
-                pos = all_doc.index(rr.page_content)
-            except:
-                print(rr.page_content)
-            left = pos
-            right = min(all_doc_length,pos+100+right_threshold-len(rr.page_content))
-            flag = 0
-            # print(rr,left,right)
-            for i in range(len(mem)):
-                if  right <= mem[i][1] and left >= mem[i][0]:
-                    flag = 1
-                    break
-                elif (left - mem[i][1]) * (right - mem[i][0]) <= 0 and right > mem[i][1]:
-                    l = mem[i][0]
-                    r = (right-mem[i][1])//2+mem[i][1]
-                    mem[i] = [l,r,mem[i][2]]
-                    flag = 1
-                    break
-            if flag == 0:
-                mem.append([left,right, rr.metadata['page']])    
+            section_docs, docs_filtered = content_retrieve(query, db_all_documents, 20, section_results, page_involved)
 
-    
-        for l,r,page in mem:
-            tender_element["reference"]["content"].append({'page': page, 'content': all_doc[l:r]})
-        if query.get("use_front_page", False):
-            tender_element["reference"]["content"] = [{'page': metadata[0]['first_index'], 'content': '\n'.join(metadata[0]['text'])}] + tender_element["reference"]["content"]
-    # length_list = [len(x) for x in tender_element["reference"]["content"]]
-    tender_element["reference"]["content"][:] = tender_element["reference"]["content"][:16]
-    content_page  = generate_response(element, tender_element["reference"]["content"], BASEDIR.joinpath('core/abstract/prompt.json'))
-    # content_page = parse_and_combine_content(content_page)
-    # content_page = 'a'
-    tender_element["ai_result"] = content_page
-    tender_element["reference"]["location"] = ', '.join([str(x['page']) for x in tender_element['reference']['content']])
+            if section_docs:
+                try:
+                    print(len(docs_filtered))
+                    docs = rerank_content(query.get('query', element), docs_filtered, top_n=8)
+                    rag_results = section_docs + docs
+                except Exception as e:
+                    print(element)
+                    print(e)
+            else:
+                global_related = []
+                global_retriever = db_all_documents.as_retriever(search_kwargs={'k': 8})
+                global_related = global_retriever.invoke(query.get('query','.'))
+                reranked_content = rerank_content(query.get('query', element), global_related, top_n=15)
+
+                rag_results = docs_filtered + reranked_content
+            right_threshold = query.get('context', 3100)
+            mem = []
+            all_doc_length = len(all_doc)
+            # print(rag_results)
+            for rr in rag_results:
+                try:
+                    pos = all_doc.index(rr.page_content)
+                except:
+                    print(rr.page_content)
+                left = pos
+                right = min(all_doc_length,pos+100+right_threshold-len(rr.page_content))
+                flag = 0
+                # print(rr,left,right)
+                for i in range(len(mem)):
+                    if  right <= mem[i][1] and left >= mem[i][0]:
+                        flag = 1
+                        break
+                    elif (left - mem[i][1]) * (right - mem[i][0]) <= 0 and right > mem[i][1]:
+                        l = mem[i][0]
+                        r = (right-mem[i][1])//2+mem[i][1]
+                        mem[i] = [l,r,mem[i][2]]
+                        flag = 1
+                        break
+                if flag == 0:
+                    mem.append([left,right, rr.metadata['page']])    
+
+        
+            for l,r,page in mem:
+                tender_element["reference"]["content"].append({'page': page, 'content': all_doc[l:r]})
+            if query.get("use_front_page", False):
+                tender_element["reference"]["content"] = [{'page': metadata[0]['first_index'], 'content': '\n'.join(metadata[0]['text'])}] + tender_element["reference"]["content"]
+        # length_list = [len(x) for x in tender_element["reference"]["content"]]
+        tender_element["reference"]["content"][:] = tender_element["reference"]["content"][:16]
+        content_page  = generate_response(element, tender_element["reference"]["content"], BASEDIR.joinpath('core/abstract/prompt.json'))
+        # content_page = parse_and_combine_content(content_page)
+        # content_page = 'a'
+        tender_element["ai_result"] = content_page
+        tender_element["reference"]["location"] = ', '.join([str(x['page']) for x in tender_element['reference']['content']])
+    except Exception as e:
+        print(e)
+        tender_element["ai_result"] = ''
+        tender_element["reference"]["location"] = ''
     return tender_element
 
 
 def generate_abstract(docx_path: str, temp_path: Optional[str]=None, cache_path: Optional[str]=None):
-    doc = Docx(docx_path) 
+    doc = Docx(docx_path, use_cache=True) 
     if temp_path or cache_path:
         doc.set_cached_dir(temp_path, cache_path)
     metadata = doc.get_rag()
@@ -138,7 +145,7 @@ def generate_abstract(docx_path: str, temp_path: Optional[str]=None, cache_path:
  
     with open(BASEDIR.joinpath('core/abstract/tender_query.json'), 'r', encoding='utf-8') as file:
         query_dict = json.load(file)
-    with ThreadPoolExecutor(max_workers=30, initializer=set_request_id()) as executor:
+    with ThreadPoolExecutor(max_workers=2, initializer=set_request_id()) as executor:
         future_to_type = {executor.submit(generate_section_content, element, query_dict, metadata, all_documents, db_all_documents, doc.rag1, all_doc): element for element in query_dict.keys()} #["合同价格与支付"]}#
         for future in future_to_type:
             element = future_to_type[future]
@@ -146,7 +153,7 @@ def generate_abstract(docx_path: str, temp_path: Optional[str]=None, cache_path:
             tender_element_list.append(tender_element)
             tender_element_dict[element] = {"content": tender_element["ai_result"], "reference": f'对应批注id：'}
             # tender_element_dict[element] = {"content": tender_element["ai_result"], "reference": f'所在页码：{tender_element["reference"]["location"]}'}
-
+    
   
     tender_element_list1 = []
     content = []
@@ -180,12 +187,14 @@ def generate_abstract(docx_path: str, temp_path: Optional[str]=None, cache_path:
         comment_text = info['section']
         add_candidate = set()
         i = 0
-        while len(add_candidate) < 3 and i < len(info['reference']['content']):
+        while len(add_candidate) < 1 and i < len(info['reference']['content']):
             add_candidate.add(info['reference']['content'][i]['page'])
             i += 1
         for index in add_candidate:
+            tmp = index
+            while doc.contents['check'][str(tmp)]['type'] == 'table':
+                tmp += 1
             try:
-                pos = doc.contents['check'][str(index)]['index']
                 add_comment_to_elements_in_place(doc.doc,[doc.doc.paragraphs[pos]._element],'bianbiaozhushou',comment_text)
                 tender_element_dict[info['section']]['reference'] += ' '+str(count)+','
                 count += 1
@@ -203,49 +212,57 @@ def generate_key_content_check_section(element: str, query_dict: dict, bid_metad
     check_element["tender_reference"] = {}
     element_query = query_dict[element]
     seen, bid_info = set(), list()
-    if p:=element_query.get("location", False):
-        bid_info = extract_location_context(bid_metadata, p)
-    elif p:=element_query.get("money", False):
-        bid_info = extract_money_context(bid_metadata, p)
-    elif p:=element_query.get("date", False):
-        bid_info = extract_dates_with_context(bid_metadata, p)
-    elif keywords:=element_query.get("keywords", False):
-        bid_info = extract_keyword_content(bid_metadata, keywords)
-    else:
-        section_results, page_involved = section_retrieve(element_query.get("bid_section_query", [element]), all_bid_documents, rag1)     
-    
-        section_docs, docs_filtered = content_retrieve(element_query, db_all_documents, 20, section_results, page_involved)
-
-        if section_docs:    
-            rag_results = rerank_content(element_query.get('query', element), section_docs, top_n=8)
+    try:
+        if p:=element_query.get("location", False):
+            bid_info = extract_location_context(bid_metadata, p)
+        elif p:=element_query.get("money", False):
+            bid_info = extract_money_context(bid_metadata, p)
+        elif p:=element_query.get("date", False):
+            bid_info = extract_dates_with_context(bid_metadata, p)
+        elif keywords:=element_query.get("keywords", False):
+            bid_info = extract_keyword_content(bid_metadata, keywords)
         else:
-            rag_results = rerank_content(element_query.get('query', element), docs_filtered, top_n=15)
-
-        for rr in rag_results:
-
-            bid_info.append({'page': rr.metadata['page'], 'content': rr.page_content})
-    if element_query.get("tender_section", False) or element_query.get("tender_info", False):
-        if tender_query:=element_query.get("tender_section", False):
-            if isinstance(tender_query, list):
-                tender_info = [f"{j}: {tender_dict[j]}" for j in tender_query]
-                tender_info = "\n".join(tender_info)
-            else:
-                tender_info = f"{tender_query}: {tender_dict[tender_query]}"
-        elif info:=element_query.get("tender_info", False):
-            tender_info = f"{element}: {info}"
-    
-        content = generate_respons_pair(element, bid_info, tender_info, BASEDIR.joinpath('core/review/prompt.json'))
-        content = parse_and_combine_content_review(content)
+            section_results, page_involved = section_retrieve(element_query.get("bid_section_query", [element]), all_bid_documents, rag1)     
         
-    else:
-        content = generate_response(element, bid_info, BASEDIR.joinpath('core/review/prompt.json'), check=False)
-        content = parse_and_combine_content_review_bid(content)
-    
-    check_element["conclusion"] = content["conclusion"]
-    check_element["ai_result"] = content["content"]
-    check_element["tender_reference"]["location"] = content.get("tender_source", "")
-    # check_element["bid_reference"]["location"] = content["page"]
-    check_element["bid_reference"]["content"] = bid_info
+            section_docs, docs_filtered = content_retrieve(element_query, db_all_documents, 20, section_results, page_involved)
+
+            if section_docs:    
+                rag_results = rerank_content(element_query.get('query', element), section_docs, top_n=8)
+            else:
+                rag_results = rerank_content(element_query.get('query', element), docs_filtered, top_n=15)
+
+            for rr in rag_results:
+
+                bid_info.append({'page': rr.metadata['page'], 'content': rr.page_content})
+        if element_query.get("tender_section", False) or element_query.get("tender_info", False):
+            if tender_query:=element_query.get("tender_section", False):
+                if isinstance(tender_query, list):
+                    tender_info = [f"{j}: {tender_dict[j]}" for j in tender_query]
+                    tender_info = "\n".join(tender_info)
+                else:
+                    tender_info = f"{tender_query}: {tender_dict[tender_query]}"
+            elif info:=element_query.get("tender_info", False):
+                tender_info = f"{element}: {info}"
+        
+            content = generate_respons_pair(element, bid_info, tender_info, BASEDIR.joinpath('core/review/prompt.json'))
+            content = parse_and_combine_content_review(content)
+            
+        else:
+            content = generate_response(element, bid_info, BASEDIR.joinpath('core/review/prompt.json'), check=False)
+            content = parse_and_combine_content_review_bid(content)
+        
+        check_element["conclusion"] = content["conclusion"]
+        check_element["ai_result"] = content["content"]
+        check_element["tender_reference"]["location"] = content.get("tender_source", "")
+        # check_element["bid_reference"]["location"] = content["page"]
+        check_element["bid_reference"]["content"] = bid_info
+    except Exception as e:
+        print(e)
+        check_element["conclusion"] = ''
+        check_element["ai_result"] = ''
+        check_element["tender_reference"]["location"] = ''
+        # check_element["bid_reference"]["location"] = content["page"]
+        check_element["bid_reference"]["content"] = []
     return check_element
 
 
@@ -269,10 +286,10 @@ def generate_key_content_check(tender_list: List[dict], bid_pdf_path: str, temp_
     all_doc = ''
     for dp in bid_metadata:
         cur = '\n'.join(dp['text'])
-        if dp['type'] == '目录' :continue
+        # if dp['type'] == '目录' :continue
         all_doc += cur + '\n'
         for line, index in zip(dp['text'], dp['index']):
-            all_bid_documents.append(langchain_Document(page_content=line, metadata={"page": index}))
+            all_bid_documents_split.append(langchain_Document(page_content=line, metadata={"page": index}))
 
 
     text_splitter = RecursiveCharacterTextSplitter(
@@ -286,9 +303,13 @@ def generate_key_content_check(tender_list: List[dict], bid_pdf_path: str, temp_
             for document in text_splitter.create_documents([data.page_content], [{"page": data.metadata['page']}])
         ]
     all_bid_documents.extend(all_documents_splitted)
-    db_all_documents = FAISS.from_documents(documents=all_bid_documents, embedding=JinaEmbeddings)
+    try:
+        db_all_documents = FAISS.from_documents(documents=all_bid_documents, embedding=JinaEmbeddings)
+    except Exception as e:
+        print(e)
+        db_all_documents = None
 
-    with ThreadPoolExecutor(max_workers=10, initializer=set_request_id()) as executor:
+    with ThreadPoolExecutor(max_workers=2, initializer=set_request_id()) as executor:
             future_to_type = {executor.submit(generate_key_content_check_section, element, query_dict, bid_metadata, all_bid_documents, db_all_documents, tender_dict, bid.rag1, all_doc): element for element in query_dict.keys()}#["报价唯一"]}
             for future in future_to_type:
                 element = future_to_type[future]
@@ -302,8 +323,25 @@ def generate_key_content_check(tender_list: List[dict], bid_pdf_path: str, temp_
         json.dump(check_element_list, f, ensure_ascii=False, indent=4)
     
     json2docx(key_review_outline, "", check_element_dict, os.path.join(bid.cached_dir,"key_content.docx") , "关键内容审查")
-
-    return check_element_list, os.path.join(bid.cached_dir,"key_content.docx")
+    for info in check_element_list:
+        comment_text = info['section']
+        add_candidate = set()
+        i = 0
+        while len(add_candidate) < 1 and i < len(info['bid_reference']['content']):
+            add_candidate.add(info['bid_reference']['content'][i]['page'])
+            i += 1
+        for index in add_candidate:
+            tmp = index
+            while doc.contents['check'][str(tmp)]['type'] == 'table':
+                tmp += 1
+            try:
+                add_comment_to_elements_in_place(bid.doc,[bid.doc.paragraphs[pos]._element],'bianbiaozhushou',comment_text)
+                check_element_dict[info['section']]['reference'] += ' '+str(count)+','
+                count += 1
+            except:
+                continue
+    doc.doc.save(os.path.join(doc.cached_dir,'key_comments.docx'))
+    return check_element_list, os.path.join(bid.cached_dir,"key_content.docx"), os.path.join(bid.cached_dir,"key_comment.docx")
 
 def generate_bid_content_check(tender_list: List[dict], bid_pdf_path: str, temp_path: Optional[str]=None, cache_path: Optional[str]=None):
     bid = Docx(bid_pdf_path)
@@ -344,7 +382,7 @@ def generate_bid_content_check(tender_list: List[dict], bid_pdf_path: str, temp_
     content = generate_check_elements(tender_dict["审查内容-评标办法"])
     eval_dict = parse_eval_content(content)
 
-    with ThreadPoolExecutor(max_workers=10, initializer=set_request_id()) as executor:
+    with ThreadPoolExecutor(max_workers=2, initializer=set_request_id()) as executor:
             future_to_type = {executor.submit(generate_key_content_check_section, element, eval_dict, bid_metadata, all_bid_documents, db_all_documents, tender_dict, bid.rag1): element for element in eval_dict.keys()}
             for future in future_to_type:
                 element = future_to_type[future]
@@ -362,8 +400,25 @@ def generate_bid_content_check(tender_list: List[dict], bid_pdf_path: str, temp_
         "响应招标文件内容审查": list(eval_dict.keys())
     }
     json2docx(outline, "", check_element_dict, os.path.join(bid.cached_dir,'bid_content.docx') , "响应招标文件内容审查")
-
-    return check_element_list, os.path.join(bid.cached_dir,'bid_content.docx')
+    for info in check_element_list:
+        comment_text = info['section']
+        add_candidate = set()
+        i = 0
+        while len(add_candidate) < 1 and i < len(info['bid_reference']['content']):
+            add_candidate.add(info['bid_reference']['content'][i]['page'])
+            i += 1
+        for index in add_candidate:
+            tmp = index
+            while doc.contents['check'][str(tmp)]['type'] == 'table':
+                tmp += 1
+            try:
+                add_comment_to_elements_in_place(bid.doc,[bid.doc.paragraphs[pos]._element],'bianbiaozhushou',comment_text)
+                check_element_dict[info['section']]['reference'] += ' '+str(count)+','
+                count += 1
+            except:
+                continue
+    bid.doc.save(os.path.join(doc.cached_dir,'bid_comments.docx'))
+    return check_element_list, os.path.join(bid.cached_dir,'bid_content.docx'), os.path.join(doc.cached_dir,'bid_comments.docx')
 
 
 def generate_outline(tender_pdf_path: str,  temp_path: Optional[str]=None, cache_path: Optional[str]=None):
@@ -411,7 +466,7 @@ if __name__ == "__main__":
     # t1 = time.time()
     # tender_list, _, _= generate_abstract("/home/ron/jiamin/bianbiaozhushou/data/test_docx/金华/【已脱敏】浙江金华招标文件.docx")
     # tender_list, _, _= generate_abstract("/home/ron/jiamin/bianbiaozhushou/data/test_docx/招标文件-大唐博罗公庄镇 150MW 复合型光伏发电项目.docx")
-    generate_abstract("/home/ron/jiamin/bianbiaozhushou/data/test_docx/招标文件—浙江建德抽水蓄能电站项目设计采购施工EPC招标文件 20240724（终）.docx")
+    generate_abstract("/home/bianbiaozhushou/data/test_docx/（招标文件）永嘉县乌牛交通枢纽互通连接线工程.docx")
     # generate_abstract("/home/ron/jiamin/bianbiaozhushou/data/test_docx/招标文件正文.docx")
     # generate_abstract("/home/ron/jiamin/bianbiaozhushou/data/test/(招标文件)贵州华电黔西南册亨岩架90MW风电项目风场区EPC总承包.docx")
     # generate_outline('/home/ron/jiamin/bianbiaozhushou/data/test_docx/（招标文件）八步仁义风电场项目EPC总承包工程招标文件（第一卷  商务部分）-2024.3.13发布版.docx')

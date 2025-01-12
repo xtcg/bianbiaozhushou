@@ -14,24 +14,32 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 import os
 
 
-# def default_preprocessing_func(text: str) -> List[str]:
-#     return list(jieba.cut_for_search(text))
+MAX_BATCHES = 16
+MAX_REQUEST_TOKENS = 200000
 
 
 class RagEmbeddings(Embeddings):
-    def __init__(self, url: str, cpu: Optional[bool] = False) -> None:
+    def __init__(self, url: str, api_key: str, model: str, cpu: Optional[bool] = False) -> None:
         super().__init__()
         self.url = url
         self.cpu = cpu
-    
+        self.api_key = api_key
+        self.model = model
+
     def get_batch_embedding(self, batch_texts):
-        payload = {"inputs": batch_texts}
-        response = requests.post(self.url, json=payload)
+        headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json"
+        }
+        payload = {"input": batch_texts, "model": self.model, "encoding_format": "float"}
+        response = requests.request("POST", url=self.url, json=payload, headers=headers)
         if response.status_code == 200:
-            return np.array(response.json())
+            response = response.json()
+            return np.array([i['embedding'] for i in response['data']])
         else:
+            # print(len(i) for i in batch_texts)
             raise ValueError(f"Error Code {response.status_code}, {response.text}")
-    
+
     def embed_documents(self, texts: List[str]) -> List[List[float]]:
         if self.cpu:
             payload = {"text": texts}
@@ -42,12 +50,15 @@ class RagEmbeddings(Embeddings):
                 raise ValueError(f"Error Code {response.status_code}, {response.text}")
         else:
             length_per_batch = max([len(text) for text in texts])
-            num_batch = min(512, 200000//length_per_batch)
+            num_batch = min(MAX_BATCHES, MAX_REQUEST_TOKENS // length_per_batch)
             batches = math.ceil(len(texts) / num_batch)
             _results = [None] * batches
             with ThreadPoolExecutor(max_workers=8) as executor:
                 future_map = {
-                    executor.submit(self.get_batch_embedding, texts[i * num_batch: (i+ 1) * num_batch] ): i
+                    executor.submit(
+                        self.get_batch_embedding,
+                        texts[i * num_batch : (i + 1) * num_batch],
+                    ): i
                     for i in range(batches)
                 }
                 for future in as_completed(future_map):
@@ -55,13 +66,14 @@ class RagEmbeddings(Embeddings):
                     _results[index] = future.result()
             results = np.concatenate(_results, axis=0)
             return results
-   
-    def embed_query(self, text: str) -> List[float]:   
+
+    def embed_query(self, text: str) -> List[float]:
         return self.embed_documents([text])[0]
 
 
-JinaEmbeddings = RagEmbeddings(url=os.environ.get("EMBEDDING_URL", "http://192.168.129.84:40068/embed"))
-RERANKER_URL = os.environ.get("RERANKING_URL", "http://192.168.129.84:40062/rerank")
+# JinaEmbeddings = RagEmbeddings(url=os.environ.get('EMBEDDING_URL'), api_key=os.environ.get('API_KEY'), model=os.environ.get('EMBEDDING_MODEL'))
+JinaEmbeddings = RagEmbeddings(url="https://api.siliconflow.cn/v1/embeddings", api_key="sk-fkmrktipsnpohnuuxrcdwqdzadpfntejsutrjaqpvopxgnwm", model="BAAI/bge-m3")
+RERANKER_URL = os.environ.get("RERANKING_URL", "https://api.siliconflow.cn/v1/rerank")
 
 @timer
 def section_retrieve(query: List, all_documents: List[langchain_Document], rag1: List, following: Optional[int]=3):
@@ -155,15 +167,18 @@ def content_retrieve(query: dict, db_all_documents: FAISS, k_total: int, section
 
 @timer
 def rerank_content(query: str, docs: List[langchain_Document], top_n: Optional[int]=10):
-    
-    payload = {"query": query, "texts": [doc.page_content[:512] for doc in docs]}
-    response = requests.post(RERANKER_URL, json=payload)
+    headers = {
+    "Authorization": "Bearer sk-fkmrktipsnpohnuuxrcdwqdzadpfntejsutrjaqpvopxgnwm",
+    "Content-Type": "application/json"
+    }
+    payload = {"model": "BAAI/bge-reranker-v2-m3","query": query, "documents": [doc.page_content[:512] for doc in docs]}
+    response = requests.post(RERANKER_URL, json=payload, headers=headers)
     if response.status_code == 200:
-        relevance = np.array(response.json())
+        relevance = response.json()
     else:
         raise ValueError(f"Error Code {response.status_code}, {response.text}")
-    
-    text_selected = [docs[dp['index']] for dp in relevance[:top_n]]
+    # print(relevance)
+    text_selected = [docs[dp['index']] for dp in relevance['results'][:top_n]]
     return text_selected
 
 
