@@ -34,7 +34,7 @@ def generate_response(element, rag_content, prompt_path, check=False):
         stream = client.chat.completions.create(
             model=model, messages=message,
             stream=True,
-            max_tokens=5000,
+            max_tokens=4096,
             temperature=0.8,
             top_p=1,
             stop=["<|im_end|>", "<|endoftext|>", "<|im_start|>"]
@@ -57,7 +57,7 @@ def generate_response(element, rag_content, prompt_path, check=False):
             stream = client.chat.completions.create(
                 model=model, messages=message,
                 stream=True,
-                max_tokens=5000,
+                max_tokens=4096,
                 temperature=0.8,
                 top_p=1,
                 stop=["<|im_end|>", "<|endoftext|>", "<|im_start|>"]
@@ -111,7 +111,7 @@ def generate_respons_pair(element, bid_info, tender_info, prompt_path):
         stream = client.chat.completions.create(
             model=model, messages=message,
             stream=True,
-            max_tokens=5000,
+            max_tokens=4096,
             temperature=0.8,
             top_p=1,
             stop=["<|im_end|>", "<|endoftext|>", "<|im_start|>"]
@@ -157,7 +157,7 @@ requirement: 对应的审查要求
         stream = client.chat.completions.create(
             model=model, messages=message,
             stream=True,
-            max_tokens=5000,
+            max_tokens=4096,
             temperature=0.8,
             top_p=1,
             stop=["<|im_end|>", "<|endoftext|>", "<|im_start|>"]
@@ -200,7 +200,7 @@ section: 对应的子章节，不包含数字
         stream = client.chat.completions.create(
             model=model, messages=message,
             stream=True,
-            max_tokens=5000,
+            max_tokens=4096,
             temperature=0.8,
             top_p=1,
             stop=["<|im_end|>", "<|endoftext|>", "<|im_start|>"]
@@ -232,7 +232,7 @@ def generate_outline_content(element, rag_info, eval_info):
         stream = client.chat.completions.create(
             model=model, messages=message,
             stream=True,
-            max_tokens=5000,
+            max_tokens=4096,
             temperature=0.8,
             top_p=1,
             stop=["<|im_end|>", "<|endoftext|>", "<|im_start|>"]
@@ -274,7 +274,7 @@ section: 总结性的评审标准作为章节名称
                 stream = client.chat.completions.create(
                     model=model, messages=message,
                     stream=True,
-                    max_tokens=5000,
+                    max_tokens=4096,
                     temperature=0.8,
                     top_p=1,
                     stop=["<|im_end|>", "<|endoftext|>", "<|im_start|>"]
@@ -365,7 +365,7 @@ def generate_outline_split(section_info):
         stream = client.chat.completions.create(
             model=model, messages=message,
             stream=True,
-            max_tokens=5000,
+            max_tokens=4096,
             temperature=0.8,
             top_p=1,
             stop=["<|im_end|>", "<|endoftext|>", "<|im_start|>"]
