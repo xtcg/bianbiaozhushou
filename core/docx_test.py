@@ -145,7 +145,7 @@ def generate_abstract(docx_path: str, temp_path: Optional[str]=None, cache_path:
  
     with open(BASEDIR.joinpath('core/abstract/tender_query.json'), 'r', encoding='utf-8') as file:
         query_dict = json.load(file)
-    with ThreadPoolExecutor(max_workers=2, initializer=set_request_id()) as executor:
+    with ThreadPoolExecutor(max_workers=1, initializer=set_request_id()) as executor:
         future_to_type = {executor.submit(generate_section_content, element, query_dict, metadata, all_documents, db_all_documents, doc.rag1, all_doc): element for element in query_dict.keys()} #["合同价格与支付"]}#
         for future in future_to_type:
             element = future_to_type[future]
@@ -309,7 +309,7 @@ def generate_key_content_check(tender_list: List[dict], bid_pdf_path: str, temp_
         print(e)
         db_all_documents = None
 
-    with ThreadPoolExecutor(max_workers=2, initializer=set_request_id()) as executor:
+    with ThreadPoolExecutor(max_workers=1, initializer=set_request_id()) as executor:
             future_to_type = {executor.submit(generate_key_content_check_section, element, query_dict, bid_metadata, all_bid_documents, db_all_documents, tender_dict, bid.rag1, all_doc): element for element in query_dict.keys()}#["报价唯一"]}
             for future in future_to_type:
                 element = future_to_type[future]
@@ -382,7 +382,7 @@ def generate_bid_content_check(tender_list: List[dict], bid_pdf_path: str, temp_
     content = generate_check_elements(tender_dict["审查内容-评标办法"])
     eval_dict = parse_eval_content(content)
 
-    with ThreadPoolExecutor(max_workers=2, initializer=set_request_id()) as executor:
+    with ThreadPoolExecutor(max_workers=1, initializer=set_request_id()) as executor:
             future_to_type = {executor.submit(generate_key_content_check_section, element, eval_dict, bid_metadata, all_bid_documents, db_all_documents, tender_dict, bid.rag1): element for element in eval_dict.keys()}
             for future in future_to_type:
                 element = future_to_type[future]

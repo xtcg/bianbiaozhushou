@@ -134,7 +134,7 @@ async def review_requirement_in_tender_doc(
         timeout=10 * 60
     )
     requirement_censor_fileid = await upload_biz_file(bizId, biz_type="censor_req", file_path=censor_docx_path)
-    requirement_comment_fileid = await upload_biz_file(bizId, biz_type="censor_req", file_path=censor_docx_path)
+    requirement_comment_fileid = await upload_biz_file(bizId, biz_type="censor_req", file_path=comment_docx_path)
     return schema.BidReqReviewResponse(
         bizId=bizId,
         requirement_censor_fileid=requirement_censor_fileid,
