@@ -340,7 +340,7 @@ def generate_key_content_check(tender_list: List[dict], bid_pdf_path: str, temp_
                 count += 1
             except:
                 continue
-    bid.doc.save(os.path.join(bid.cached_dir,'key_comments.docx'))
+    bid.doc.save(os.path.join(bid.cached_dir,'key_comment.docx'))
     return check_element_list, os.path.join(bid.cached_dir,"key_content.docx"), os.path.join(bid.cached_dir,"key_comment.docx")
 
 def generate_bid_content_check(tender_list: List[dict], bid_pdf_path: str, temp_path: Optional[str]=None, cache_path: Optional[str]=None):
@@ -417,8 +417,8 @@ def generate_bid_content_check(tender_list: List[dict], bid_pdf_path: str, temp_
                 count += 1
             except:
                 continue
-    bid.doc.save(os.path.join(bid.cached_dir,'bid_comments.docx'))
-    return check_element_list, os.path.join(bid.cached_dir,'bid_content.docx'), os.path.join(doc.cached_dir,'bid_comments.docx')
+    bid.doc.save(os.path.join(bid.cached_dir,'bid_comment.docx'))
+    return check_element_list, os.path.join(bid.cached_dir,'bid_content.docx'), os.path.join(doc.cached_dir,'bid_comment.docx')
 
 
 def generate_outline(tender_pdf_path: str,  temp_path: Optional[str]=None, cache_path: Optional[str]=None):
