@@ -332,7 +332,7 @@ def generate_key_content_check(tender_list: List[dict], bid_pdf_path: str, temp_
             i += 1
         for index in add_candidate:
             tmp = index
-            while doc.contents['check'][str(tmp)]['type'] == 'table':
+            while bid.contents['check'][str(tmp)]['type'] == 'table':
                 tmp += 1
             try:
                 add_comment_to_elements_in_place(bid.doc,[bid.doc.paragraphs[pos]._element],'bianbiaozhushou',comment_text)
@@ -409,7 +409,7 @@ def generate_bid_content_check(tender_list: List[dict], bid_pdf_path: str, temp_
             i += 1
         for index in add_candidate:
             tmp = index
-            while doc.contents['check'][str(tmp)]['type'] == 'table':
+            while bid.contents['check'][str(tmp)]['type'] == 'table':
                 tmp += 1
             try:
                 add_comment_to_elements_in_place(bid.doc,[bid.doc.paragraphs[pos]._element],'bianbiaozhushou',comment_text)
