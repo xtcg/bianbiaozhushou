@@ -195,7 +195,7 @@ def generate_abstract(docx_path: str, temp_path: Optional[str]=None, cache_path:
             while doc.contents['check'][str(tmp)]['type'] == 'table':
                 tmp += 1
             try:
-                add_comment_to_elements_in_place(doc.doc,[doc.doc.paragraphs[pos]._element],'bianbiaozhushou',comment_text)
+               pos = doc.contents['check'][str(tmp)]['index'] add_comment_to_elements_in_place(doc.doc,[doc.doc.paragraphs[pos]._element],'bianbiaozhushou',comment_text)
                 tender_element_dict[info['section']]['reference'] += ' '+str(count)+','
                 count += 1
             except Exception as e:
@@ -336,7 +336,7 @@ def generate_key_content_check(tender_list: List[dict], bid_pdf_path: str, temp_
             while bid.contents['check'][str(tmp)]['type'] == 'table':
                 tmp += 1
             try:
-                add_comment_to_elements_in_place(bid.doc,[bid.doc.paragraphs[pos]._element],'bianbiaozhushou',comment_text)
+               pos = bid.contents['check'][str(tmp)]['index'] add_comment_to_elements_in_place(bid.doc,[bid.doc.paragraphs[pos]._element],'bianbiaozhushou',comment_text)
                 check_element_dict[info['section']]['reference'] += ' '+str(count)+','
                 count += 1
             except Exception as e:
@@ -414,7 +414,7 @@ def generate_bid_content_check(tender_list: List[dict], bid_pdf_path: str, temp_
             while bid.contents['check'][str(tmp)]['type'] == 'table':
                 tmp += 1
             try:
-                add_comment_to_elements_in_place(bid.doc,[bid.doc.paragraphs[pos]._element],'bianbiaozhushou',comment_text)
+               pos = bid.contents['check'][str(tmp)]['index'] add_comment_to_elements_in_place(bid.doc,[bid.doc.paragraphs[pos]._element],'bianbiaozhushou',comment_text)
                 check_element_dict[info['section']]['reference'] += ' '+str(count)+','
                 count += 1
             except Exception as e:
