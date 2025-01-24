@@ -196,7 +196,7 @@ def generate_abstract(docx_path: str, temp_path: Optional[str]=None, cache_path:
                 tmp += 1
             try:
                 pos = doc.contents['check'][str(tmp)]['index']
-add_comment_to_elements_in_place(doc.doc,[doc.doc.paragraphs[pos]._element],'bianbiaozhushou',comment_text)
+         add_comment_to_elements_in_place(doc.doc,[doc.doc.paragraphs[pos]._element],'bianbiaozhushou',comment_text)
                 tender_element_dict[info['section']]['reference'] += ' '+str(count)+','
                 count += 1
             except Exception as e:
