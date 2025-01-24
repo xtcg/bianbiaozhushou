@@ -198,7 +198,8 @@ def generate_abstract(docx_path: str, temp_path: Optional[str]=None, cache_path:
                 add_comment_to_elements_in_place(doc.doc,[doc.doc.paragraphs[pos]._element],'bianbiaozhushou',comment_text)
                 tender_element_dict[info['section']]['reference'] += ' '+str(count)+','
                 count += 1
-            except:
+            except Exception as e:
+                print(e)
                 continue
     doc.doc.save(os.path.join(doc.cached_dir,'comments.docx'))
     json2docx(abstract_outline, tender_element_dict['项目名称']["content"], tender_element_dict, os.path.join(doc.cached_dir,'file.docx') , "商务分析")
@@ -415,7 +416,8 @@ def generate_bid_content_check(tender_list: List[dict], bid_pdf_path: str, temp_
                 add_comment_to_elements_in_place(bid.doc,[bid.doc.paragraphs[pos]._element],'bianbiaozhushou',comment_text)
                 check_element_dict[info['section']]['reference'] += ' '+str(count)+','
                 count += 1
-            except:
+            except Exception as e:
+                print(e)
                 continue
     bid.doc.save(os.path.join(bid.cached_dir,'bid_comment.docx'))
     return check_element_list, os.path.join(bid.cached_dir,'bid_content.docx'), os.path.join(doc.cached_dir,'bid_comment.docx')
