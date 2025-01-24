@@ -339,7 +339,8 @@ def generate_key_content_check(tender_list: List[dict], bid_pdf_path: str, temp_
                 add_comment_to_elements_in_place(bid.doc,[bid.doc.paragraphs[pos]._element],'bianbiaozhushou',comment_text)
                 check_element_dict[info['section']]['reference'] += ' '+str(count)+','
                 count += 1
-            except:
+            except Exception as e:
+                print(e)
                 continue
     bid.doc.save(os.path.join(bid.cached_dir,'key_comment.docx'))
     return check_element_list, os.path.join(bid.cached_dir,"key_content.docx"), os.path.join(bid.cached_dir,"key_comment.docx")
